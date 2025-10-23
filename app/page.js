@@ -15,10 +15,22 @@ export default function Home() {
     <div className="bg-blue-500 w-full">
       <h1>Focus Flow</h1>
       <button
+        onClick={()=> route.push("/tasks")}
+        className="bg-green-500 rounded-md px-4 py-2 mx-2"
+      >
+        to tasks
+      </button>
+      <button
         onClick={()=> route.push("/dashboard")}
         className="bg-green-500 rounded-md px-4 py-2 mx-2"
       >
         to dashboard
+      </button>
+      <button
+        onClick={()=> route.push("/kanban")}
+        className="bg-green-500 rounded-md px-4 py-2 mx-2"
+      >
+        to Kanban
       </button>
     </div>
       );
