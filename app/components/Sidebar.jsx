@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 const Sidebar = () => {
     const route = useRouter();
     return (
-        <div className='bg-amber-300 flex flex-col gap-2'>
+        <div className='bg-amber-300 flex flex-col gap-2 '>
             <h1>this is sidebar</h1>
 
             <button
