@@ -1,7 +1,7 @@
 export default function DashboardLayout({ children }) {
   return (
       <div
-        className={`w-auto bg-amber-400`}
+        className={`bg-green-200 w-full h-full`}
       >
         {children}
       </div>

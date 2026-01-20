@@ -1,10 +1,17 @@
-import React from 'react'
-
+import { ThemeToggle } from "./ThemeToggle"
 const Navbar = () => {
   return (
-    <div className='bg-green-300'>
-        this is navbar
-    </div>
+    <header className="h-14 shrink-0 border-b flex items-center justify-between px-4">
+      {/* Left: Search */}
+      <div className="flex-1 max-w-md">
+        <p>search box</p>
+      </div>
+
+      {/* Right: actions */}
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+      </div>
+    </header>
   )
 }
 

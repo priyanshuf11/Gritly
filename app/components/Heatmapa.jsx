@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  startOfMonth,
-  endOfMonth,
   startOfYear,
   endOfYear,
   startOfWeek,
@@ -10,46 +8,40 @@ import {
   addDays,
   format,
 } from "date-fns";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const activityLevels = [
-  "bg-gray-200",
-  "bg-green-200",
-  "bg-green-400",
-  "bg-green-600",
-  "bg-green-800",
+  "bg-[var(--hm-0)]",
+  "bg-[var(--hm-1)]",
+  "bg-[var(--hm-2)]",
+  "bg-[var(--hm-3)]",
+  "bg-[var(--hm-4)]",
 ];
 
-export default function Heatmapb({ data }) {
+export default function Heatmap({ data }) {
+  // Map date -> count
   const activityMap = data.reduce((acc, item) => {
     acc[item.date] = item.count;
     return acc;
   }, {});
 
-  const yearStart = startOfYear(new Date());
-  const yearEnd = endOfYear(new Date());
+  // Build full-year week grid
+  const yearStart = startOfWeek(startOfYear(new Date()), { weekStartsOn: 0 });
+  const yearEnd = endOfWeek(endOfYear(new Date()), { weekStartsOn: 0 });
+  const targetYear = new Date().getFullYear();
 
-  function getWeeksForMonth(date) {
-    const monthStart = startOfMonth(date);
-    const monthEnd = endOfMonth(date);
 
-    // extend to full weeks (Sunday–Saturday)
-    const rangeStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const rangeEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const weeks = [];
+  let current = yearStart;
 
-    const weeks = [];
-    let current = rangeStart;
-
-    while (current <= rangeEnd) {
-      const week = [];
-      for (let i = 0; i < 7; i++) {
-        week.push(current);
-        current = addDays(current, 1);
-      }
-      weeks.push(week);
+  while (current <= yearEnd) {
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      week.push(current);
+      current = addDays(current, 1);
     }
-
-    return weeks;
+    weeks.push(week);
   }
 
   function getLevel(count) {
@@ -60,75 +52,63 @@ export default function Heatmapb({ data }) {
     return 4;
   }
 
-  // Build all 12 months
-  const months = [];
-  let current = yearStart;
-  while (current <= yearEnd) {
-    months.push(new Date(current));
-    current = addDays(endOfMonth(current), 1); // jump to next month
-  }
-
   return (
-    <Card className="w-4/6">
+    <Card className="max-w-5xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-sm font-medium text-gray-700">
+        <CardTitle className="text-sm font-medium">
           Yearly Activity
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        <div className="flex space-x-2 overflow-x-auto pb-2">
-          {months.map((monthDate, mi) => {
-            const monthLabel = format(monthDate, "MMMM");
-            const weeks = getWeeksForMonth(monthDate);
+        {/* Month labels */}
+        <div className="flex mb-2 ml-6 space-x-[2px] text-xs text-muted-foreground">
+          {weeks.map((week, wi) => {
+            const firstDay = week[0];
+            const prevWeek = weeks[wi - 1];
+
+            const currentMonth = firstDay.getMonth();
+            const currentYear = firstDay.getFullYear();
+
+            const prevMonth =
+              prevWeek ? prevWeek[0].getMonth() : null;
+
+            const isNewMonth =
+              wi === 0 || currentMonth !== prevMonth;
+
+            // Only label months that belong to the target year
+            const isInTargetYear = currentYear === targetYear;
 
             return (
-              <div
-                key={mi}
-                className="flex flex-col items-center min-w-max"
-              >
-                {/* Month label */}
-                <h3 className="text-xs font-medium text-gray-600 mb-2">
-                  {monthLabel}
-                </h3>
-
-                {/* Month heatmap */}
-                <div className="flex space-x-[2px]">
-                  {weeks.map((week, wi) => (
-                    <div
-                      key={wi}
-                      className="flex flex-col space-y-[2px]"
-                    >
-                      {week.map((day, di) => {
-                        const dateKey = format(day, "yyyy-MM-dd");
-
-                        // show blank for days not in this month
-                        if (format(day, "MM") !== format(monthDate, "MM")) {
-                          return (
-                            <div
-                              key={di}
-                              className="w-3 h-3 rounded-sm bg-transparent"
-                            />
-                          );
-                        }
-
-                        const count = activityMap[dateKey] ?? 0;
-                        const level = getLevel(count);
-
-                        return (
-                          <div
-                            key={di}
-                            className={`w-3 h-3 rounded-sm ${activityLevels[level]}`}
-                            title={`${dateKey}: ${count} activities`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
+              <div key={wi} className="w-3 text-xs text-muted-foreground">
+                {isNewMonth && isInTargetYear
+                  ? format(firstDay, "MMM")
+                  : ""}
               </div>
             );
           })}
+
+        </div>
+
+        {/* Heatmap grid */}
+        <div className="flex space-x-[2px]">
+          {weeks.map((week, wi) => (
+            <div key={wi} className="flex flex-col space-y-[2px]">
+              {week.map((day, di) => {
+                const dateKey = format(day, "yyyy-MM-dd");
+                const count = activityMap[dateKey] ?? 0;
+                const level = getLevel(count);
+
+                return (
+                  <div
+                    key={di}
+                    className={`w-3 h-3 rounded-sm ${activityLevels[level]}`}
+                    title={`${dateKey}: ${count} activities`}
+                  />
+                );
+              })}
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

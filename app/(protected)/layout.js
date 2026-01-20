@@ -46,12 +46,12 @@ export default function ProtectedLayout({ children }) {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-    <ThemeToggle />
-  </SidebarFooter>
+          <ThemeToggle />
+        </SidebarFooter>
       </Sidebar>
 
       {/* Main content */}
-      <SidebarInset>
+      <SidebarInset className="flex flex-col h-screen">
         <Navbar />
         <main className="flex-1 p-6 overflow-y-auto">
           {children}
