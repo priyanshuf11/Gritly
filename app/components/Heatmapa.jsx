@@ -60,7 +60,7 @@ export default function Heatmap({ data }) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="">
         {/* Month labels */}
         <div className="flex mb-2 ml-6 space-x-[2px] text-xs text-muted-foreground">
           {weeks.map((week, wi) => {
